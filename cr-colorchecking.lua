@@ -7,30 +7,37 @@
 
 ]]
 
--- This is the color table, you're going to populate this table with all the colors you need.
--- Make sure there is a comma at the end of each line except for the last, otherwise AutoTouch
--- will throw an error at you when you try and run this script. The colors need to be in
--- interger format. You can use the AutoTouch helper to find the colors.
+-- This is your color class, don't touch this.
 
-local Color = {
-    white   = 16777215,
-    red     = 16711680,
-    green   = 65280,
-    blue    = 255
+local Color = {}
+function Color.new(table, region)
+    local o = {}
+    o.table = table
+    o.region = region
+    return o
+end
+
+-- This is where you will add your colors, get this from the AutoTouch helper function, you can replace nil
+-- with whatever region you need. 
+
+local Pixels = {
+    white   = Color.new({{16763733,0,0}, {16771668,0,86}, {16771669,86,86}, {16763734,86,0}}, nil),
+    blue    = Color.new({{16764763,0,0}, {16766040,0,86}, {38542343,86,86}, {16762428,86,0}}, nil),
+    red     = Color.new({{11391980,0,0}, {13625850,0,86}, {13757436,86,86}, {11391981,86,0}}, nil)
 }
 
--- This function will check for the color on the screen, keep in mind this will scan the entire
--- screen as 'region' is nil. If this function finds the color, it will return true.
+-- This function will check for the colors on the screen, it's set to match all points. Change the count
+-- parameter if you want less accuracy.
 
 function hasColor(color)
-    local t = findColor(color, 0, nil)
+    local t = findColors(color.table, 0, color.region)
 
     -- if color is found then return true
     if next(t) ~= nil then
-        log(string.format("1. Found %s instances of color %s", #t, color))
+        log(string.format("1. Found %s instances of color %s", #t, color.table[1][1]))
         return true
     else
-        log(string.format("1. Did not find %s", color))
+        log(string.format("1. Did not find %s", color.table[1][1]))
     end
 end
 
@@ -38,17 +45,17 @@ end
 -- Additionally, this function will tap every pixel where the color is found.
 
 function tapColor(color)
-    local t = findColor(color, 0, nil)
+    local t = findColors(color.table, 0, color.region)
 
     -- if color is found then tap each instance of it
     if next(t) ~= nil then
-        log(string.format("2. Found %s instances of color %s", #t, color))
+        log(string.format("2. Found %s instances of color %s", #t, color.table[1][1]))
         for k, v in pairs(t) do
             tap(v[1], v[2])
             log(string.format("3. Tapped: %f, %f", v[1], v[2]))
         end
     else
-        log(string.format("2. Did not find %s", color))
+        log(string.format("2. Did not find %s", color.table[1][1]))
     end
 end
 
@@ -64,5 +71,4 @@ end
 
 -- Anything below here feel free to edit, change for the colors. 
 
-colorBranch(Color.white, Color.red)
-colorBranch(Color.green, Color.blue)
+colorBranch(Pixels.white, Pixels.red)
